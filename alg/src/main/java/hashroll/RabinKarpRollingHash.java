@@ -9,9 +9,10 @@ public class RabinKarpRollingHash{
 
     private final int p = 31;
     private final int MOD = 1_000_000_009;
-    
+    MetricCollector metrics = new MetricCollector();
     //Search pattern Method
     public ArrayList<Integer> search(String pattern, String originalString){
+        metrics.start();
         int patternLength = pattern.length();
         int origStringLength = originalString.length();
         //Initialize the length of the inputs
@@ -21,7 +22,7 @@ public class RabinKarpRollingHash{
         for(int i = 1 ; i < pPow.length; i ++){
 
             pPow[i] = ((pPow[i-1] * p) % MOD);
-
+            
         }
 
         long[] h = new long[origStringLength+1];
@@ -31,7 +32,7 @@ public class RabinKarpRollingHash{
         for(int i = 0 ;i < origStringLength; i++){
 
             h[i+1] = ((h[i] + (originalString.charAt(i) - 'a' + 1) * pPow[i]) % MOD); 
-
+            metrics.hashCalc();
         }
         
         long patternHash = 0;
@@ -41,7 +42,7 @@ public class RabinKarpRollingHash{
         for(int i = 0 ; i < patternLength; i++){
 
             patternHash = (patternHash + ((pattern.charAt(i) - 'a' + 1) * pPow[i])) % MOD;
-
+            metrics.hashCalc();
         }
 
         //resulting array
@@ -52,14 +53,26 @@ public class RabinKarpRollingHash{
         for(int i = 0 ; i + patternLength <= origStringLength; i++){
             long currentHash = (h[i+patternLength] - h[i] + MOD) % MOD;
             long expectedHash = (patternHash * pPow[i]) % MOD;
+            metrics.hashCalc();
+            metrics.hashCalc();
             if (currentHash == expectedHash){ 
                 if (originalString.substring(i, i + patternLength).equals(pattern)) {
                     arrOfIndexes.add(i);
+                    metrics.matches();
                 }
+                else{
+                    metrics.falsePositive();
+                }
+            }else{
+                metrics.collision();
             }
         }
         //return the arraylist with indexes, which means the starting index of found pattern in original;
+        metrics.stop();
         return arrOfIndexes;
 
+    }
+    public void exportCSV(String filename) {
+        metrics.exportCSV(filename);
     }
 }
