@@ -18,10 +18,16 @@ Algorithm also collects metrics and exports it in csv format.
 
 ## Metrics
 Large graph
+
+
 ![alt text](image.png)
 
 Medium graph
+
+
 ![alt text](image-1.png)
 
 Small graph
+
+
 ![alt text](image-2.png)
